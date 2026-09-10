@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeForge — Autonomous Multi-Language Code Repair & Polyglot Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Header / Navigation Bar -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="brand">
+        <div class="brand-logo">⚡</div>
+        <div class="brand-text">
+          <h1>CodeForge</h1>
+          <span class="badge-status">Autonomous Agent Online</span>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="toolchain-pill" title="CPython 3.12 verified">🐍 Python 3.12</span>
+        <span class="toolchain-pill" title="Node.js v24 verified">🟨 Node v24</span>
+        <span class="toolchain-pill" title="Java 22 verified">☕ Java 22</span>
+        <span class="toolchain-pill" title="SQLite3 verified">🗄️ SQLite3</span>
+        <span class="toolchain-pill static-only" title="Static analysis only">+5 Polyglot Skills</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Preset quick selector -->
+    <section class="presets-section">
+      <span class="presets-label">⚡ Load Sample Broken Code:</span>
+      <div id="presets-container" class="presets-buttons">
+        <button class="preset-btn" data-id="py_user_processor">Broken Python (User Processor)</button>
+        <button class="preset-btn" data-id="py_binary_search">Algorithmic Binary Search (Off-by-One)</button>
+        <button class="preset-btn" data-id="c_buffer_overflow">Broken C (Buffer Vulnerability)</button>
+        <button class="preset-btn" data-id="js_async_equality">Broken JS (Var & Equality)</button>
+        <button class="preset-btn" data-id="sql_null_wildcard">Broken SQL (NULL Check)</button>
+      </div>
+    </section>
+
+    <!-- ZONE 0: UPLOAD & WORKSPACE -->
+    <section class="canvas-zone zone-upload" id="zone-upload">
+      <div class="zone-header">
+        <div class="zone-title">
+          <span class="zone-number">ZONE 0</span>
+          <h2>Upload & Workspace</h2>
+        </div>
+        <div class="zone-actions">
+          <span id="detected-lang-badge" class="lang-badge">Detected: Python (90%)</span>
+        </div>
+      </div>
+
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="file-input" class="hidden-input">
+        <div class="dropzone-content">
+          <div class="dropzone-icon">📁</div>
+          <div class="dropzone-text">
+            <strong>Drop your broken source file here</strong> or <span class="browse-link">browse</span>
+            <div class="supported-exts">.py, .c, .cpp, .java, .js, .ts, .go, .rs, .cs, .sql</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-panel">
+        <div class="editor-header">
+          <span class="editor-filename" id="editor-filename">input_code.py</span>
+          <div class="editor-controls">
+            <label for="manual-lang-select">Language:</label>
+            <select id="manual-lang-select" class="lang-select">
+              <option value="auto">Auto Detect</option>
+              <option value="python">Python</option>
+              <option value="c">C</option>
+              <option value="cpp">C++</option>
+              <option value="java">Java</option>
+              <option value="javascript">JavaScript</option>
+              <option value="typescript">TypeScript</option>
+              <option value="go">Go</option>
+              <option value="rust">Rust</option>
+              <option value="csharp">C#</option>
+              <option value="sql">SQL</option>
+            </select>
+            <button id="clear-btn" class="btn btn-secondary">Clear</button>
+          </div>
+        </div>
+        <textarea id="code-editor" class="code-textarea" placeholder="// Paste or upload your broken source code here..." spellcheck="false"></textarea>
+      </div>
+
+      <div class="cta-container">
+        <button id="process-btn" class="btn btn-primary btn-cta">
+          <span class="btn-icon">⚡</span> Run Autonomous CodeForge Repair
+        </button>
+      </div>
+    </section>
+
+    <!-- LOADING SPINNER -->
+    <div id="loading-state" class="loading-state hidden">
+      <div class="spinner"></div>
+      <div class="loading-title">Autonomous Triage & Polyglot Repair in Progress</div>
+      <div class="loading-subtitle">Diagnosing defects • Running sandbox execution • Synthesizing 9-language polyglot grid</div>
+    </div>
+
+    <!-- ZONE 1: DIAGNOSIS PANEL -->
+    <section class="canvas-zone zone-diagnosis hidden" id="zone-diagnosis">
+      <div class="zone-header">
+        <div class="zone-title">
+          <span class="zone-number">ZONE 1</span>
+          <h2>Diagnosis Panel</h2>
+        </div>
+        <div class="diagnosis-stats">
+          <span class="badge-count count-blocks" id="count-blocks">0 Blocks Compilation</span>
+          <span class="badge-count count-risks" id="count-risks">0 Logic Risks</span>
+          <span class="badge-count count-style" id="count-style">0 Style Only</span>
+        </div>
+      </div>
+
+      <!-- Algorithmic / DSA Summary Box -->
+      <div class="dsa-box" id="dsa-box">
+        <div class="dsa-header">
+          <span class="dsa-icon">🧠</span>
+          <strong>Cross-Cutting DSA Correctness Summary</strong>
+        </div>
+        <div class="dsa-grid">
+          <div><strong>Time Complexity:</strong> <span id="dsa-time">O(N)</span></div>
+          <div><strong>Space Complexity:</strong> <span id="dsa-space">O(1)</span></div>
+          <div class="full-width"><strong>Edge Cases Verified:</strong> <span id="dsa-edge">Empty input, boundaries, null safety</span></div>
+        </div>
+      </div>
+
+      <div class="diagnosis-list" id="diagnosis-list">
+        <!-- Injected dynamically -->
+      </div>
+    </section>
+
+    <!-- ZONE 2: FIXED ORIGINAL -->
+    <section class="canvas-zone zone-fixed hidden" id="zone-fixed">
+      <div class="zone-header">
+        <div class="zone-title">
+          <span class="zone-number">ZONE 2</span>
+          <h2>Fixed Original (<span id="fixed-lang-label">Python</span>)</h2>
+        </div>
+        <div class="zone-actions">
+          <button id="copy-fixed-btn" class="btn btn-secondary btn-sm">📋 Copy Code</button>
+          <button id="rerun-fixed-btn" class="btn btn-primary btn-sm">▶ Re-run Sandbox</button>
+        </div>
+      </div>
+
+      <!-- Sticky Meta Sub-header -->
+      <div class="fixed-meta-bar">
+        <div><strong>Toolchain:</strong> <span id="fixed-toolchain">CPython 3.12.4</span></div>
+        <div><strong>Status:</strong> <span id="fixed-status" class="status-pill status-success">Executed Successfully</span></div>
+        <div><strong>Exit Code:</strong> <span id="fixed-exit-code">0</span></div>
+        <div><strong>Runtime:</strong> <span id="fixed-runtime">25 ms</span></div>
+      </div>
+
+      <!-- Sub-Tabs: Code | Diff | Output -->
+      <div class="tabs-container">
+        <div class="tab-strip">
+          <button class="tab-btn active" data-tab="tab-fixed-code">✅ Corrected Code</button>
+          <button class="tab-btn" data-tab="tab-fixed-diff">🔍 Side-by-Side Diff</button>
+          <button class="tab-btn" data-tab="tab-fixed-output">▶ Terminal Execution Output</button>
+        </div>
+
+        <div class="tab-contents">
+          <!-- Code Tab -->
+          <div class="tab-content active" id="tab-fixed-code">
+            <pre class="code-view"><code id="fixed-code-block"></code></pre>
+          </div>
+
+          <!-- Diff Tab -->
+          <div class="tab-content" id="tab-fixed-diff">
+            <div class="diff-container" id="diff-container">
+              <pre class="diff-view"><code id="diff-code-block"></code></pre>
+            </div>
+          </div>
+
+          <!-- Output Tab -->
+          <div class="tab-content" id="tab-fixed-output">
+            <div class="terminal-container">
+              <div class="terminal-bar">
+                <span class="terminal-dot red"></span>
+                <span class="terminal-dot yellow"></span>
+                <span class="terminal-dot green"></span>
+                <span class="terminal-title">CodeForge Sandboxed Output Runner</span>
+              </div>
+              <pre class="terminal-output" id="fixed-terminal-output"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZONE 3: POLYGLOT GRID -->
+    <section class="canvas-zone zone-polyglot hidden" id="zone-polyglot">
+      <div class="zone-header">
+        <div class="zone-title">
+          <span class="zone-number">ZONE 3</span>
+          <h2>Polyglot Reproduction Grid</h2>
+        </div>
+        <div class="parity-summary-banner">
+          <span>Behavioral Parity Verified Across Supported Language Skills</span>
+        </div>
+      </div>
+
+      <!-- Top Parity Summary Row -->
+      <div class="parity-matrix-strip" id="parity-matrix-strip">
+        <!-- Generated dynamically -->
+      </div>
+
+      <!-- Polyglot Language Tabs -->
+      <div class="polyglot-container">
+        <div class="polyglot-tabs" id="polyglot-tabs">
+          <!-- Language tab buttons injected here -->
+        </div>
+
+        <div class="polyglot-card-body" id="polyglot-card-body">
+          <div class="polyglot-card-meta">
+            <div class="meta-item"><strong>Build/Run Command:</strong> <code id="poly-cmd" class="cmd-chip"></code></div>
+            <div class="meta-item"><strong>Parity Caveat:</strong> <span id="poly-caveat"></span></div>
+          </div>
+
+          <div class="code-output-split">
+            <div class="split-col">
+              <div class="split-title">
+                <span>Idiomatic Source Code</span>
+                <button id="copy-poly-btn" class="btn btn-secondary btn-xs">Copy</button>
+              </div>
+              <pre class="code-view"><code id="poly-code-block"></code></pre>
+            </div>
+            <div class="split-col">
+              <div class="split-title">
+                <span>Sandbox Output</span>
+                <span id="poly-status-badge" class="badge-status">Online</span>
+              </div>
+              <div class="terminal-container compact">
+                <pre class="terminal-output" id="poly-terminal-output"></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-content">
+      <span>CodeForge Autonomous Engine • Antigravity AI Platform</span>
+      <span>Operating Rules: Minimal-Diff • Sandboxed Real Output • Verified Parity</span>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
